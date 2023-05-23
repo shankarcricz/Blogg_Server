@@ -19,18 +19,18 @@ const signJWT = id => {
       });
 }
 
-// const storage = multer.diskStorage({
-//   destination : function(req, file, cb) {
-//     console.log(file)
-//     cb(null, `./public/images`)
-//   },
-//   filename : function(req, file, cb) {
-//     const ext = file.mimetype.split('/')[1]
-//     cb(null,`user-${req.user?.id || crypto.randomUUID()}+${Date.now()}.${ext}`)
-//   }
-// })
+const storage = multer.diskStorage({
+  destination : function(req, file, cb) {
+    console.log(file)
+    cb(null, `./public/images`)
+  },
+  filename : function(req, file, cb) {
+    const ext = file.mimetype.split('/')[1]
+    cb(null,`user-${req.user?.id || crypto.randomUUID()}+${Date.now()}.${ext}`)
+  }
+})
 
-const storage = multer.memoryStorage();
+// const storage = multer.memoryStorage();
 
 const filter = (req, file, cb) => {
   if(file.mimetype.startsWith('image')){
@@ -45,17 +45,18 @@ const upload = multer({
   fileFilter : filter  
 })
 
-exports.resizePhoto = (req, res, next) => {
-  if(!req.file) return next();
-  req.file.filename = `user-${req.user?.id || crypto.randomUUID()}+${Date.now()}.jpeg`
-  sharp(req.file.buffer).resize(500,500).toFormat('jpeg').jpeg({quality:90}).toFile(`./public/images/${req.file.filename}`)
-  next();
-}
+// exports.resizePhoto = (req, res, next) => {
+//   console.log
+//   if(!req.file) return next();
+//   req.file.filename = `user-${req.user?.id || crypto.randomUUID()}+${Date.now()}.jpeg`
+//   sharp(req.file.buffer).resize(500,500).toFormat('jpeg').jpeg({quality:90}).toFile(`./public/images/${req.file.filename}`)
+//   next();
+// }
 
 exports.uploadPhoto = upload.single('photo')
 
 exports.signup = asyncCatch(async (req, res, next) => {
-  req.body.photo = req.file?.filename
+  req.body.photo = req.file?.path
   const newUser = await User.create(req.body);
   //jwt token is created
   const token = signJWT(newUser._id)
@@ -192,12 +193,13 @@ exports.forgotPassword = asyncCatch(async (req, res , next) => {
 
   //the below fn returns photo variable since the original might not be updated for now
   exports.updateMe = asyncCatch(async (req, res, next) => {
+    console.log(req)
     const userObj = {}
     // Object.keys(req.body).forEach(key => {
     //   if(key === 'name' || key === 'email')
     //   userObj[key] = req.body[key];
     // })
-    let photo = req.file?.filename
+    let photo = req.file?.path
     if(req.file) userObj.photo = photo;
     console.log(userObj);
     const user = await User.findById(req.user.id);
