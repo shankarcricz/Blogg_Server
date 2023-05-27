@@ -3,6 +3,18 @@ const Blog = require("../models/blogModel");
 const User = require("../models/userModel");
 const asyncCatch = require("./asyncCatch");
 const { addHistory } = require("./userController");
+const storageF = require("./fireBase");
+const {
+    getStorage,
+    ref,
+    uploadBytes,
+    getDownloadURL,
+    updateMetadata,
+    getBlob,
+  } = require("firebase/storage");
+
+
+
 
 exports.getBlogs = asyncCatch(async (req, res, next) => {
     //return blogs
@@ -17,8 +29,10 @@ exports.getBlogs = asyncCatch(async (req, res, next) => {
 
 exports.createBlog = asyncCatch(async (req, res, next) => {
     req.body.createdUser = req.user.id;
-    let photo = req.file.path.split('\\').join('/')
-    if(req.file) req.body.photo = photo;
+    const photoRef = ref(storageF, req.file.filename);
+    const snapshot = await uploadBytes(photoRef, req.file.buffer, {contentType: req.file.mimetype});
+    const url = await getDownloadURL(snapshot.ref);
+    req.body.photo = url;
     const blog = await Blog.create(req.body);
     req.user.blogsWritten.push(blog._id)
     await req.user.save({validateBeforeSave : false})

@@ -10,6 +10,7 @@ const userRouter = require('./routes/userRouter');
 const commentRouter = require('./routes/commentRouter');
 const path = require('path')
 const bodyParser = require('body-parser');
+const multer = require('multer');
 
 app.use(express.json())
 // Parse JSON bodies

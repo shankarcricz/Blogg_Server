@@ -1,7 +1,7 @@
 const { getBlogs, createBlog, getBlogsById, getBlogsBySearchParam, updateBlogById, deleteBlogById, getRecommendations, getFollowingBlogs, updateImage } = require('../Contollers/blogController')
 
 const express = require('express')
-const { protect, uploadPhoto } = require('../Contollers/userController')
+const { protect, uploadPhoto, resizePhoto } = require('../Contollers/userController')
 const { getCommentsByBlogId } = require('../Contollers/commentController')
 
 
@@ -9,7 +9,7 @@ const blogRouter = express.Router()
 
 
 
-blogRouter.route('/').get(getBlogs).post(protect,uploadPhoto,createBlog)
+blogRouter.route('/').get(getBlogs).post(protect,uploadPhoto,resizePhoto,createBlog)
 blogRouter.route('/updateImage').post(protect, uploadPhoto, updateImage)
 blogRouter.route('/recommendations').get(protect, getRecommendations);
 blogRouter.route('/following').get(protect, getFollowingBlogs)

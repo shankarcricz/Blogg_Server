@@ -60,6 +60,8 @@ const blogSchema = new mongoose.Schema({
 //     localField: '_id'
 // })
 
+blogSchema.index({title: 1})
+
 
 
 
