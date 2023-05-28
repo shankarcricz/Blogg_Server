@@ -61,6 +61,17 @@ exports.getBlogsById = asyncCatch(async (req, res, next) => {
     })
 })
 
+exports.getBlogsForLoggedInUser = asyncCatch(async(req, res, next) => {
+    const {blogsWritten} = await User.findById(req.user.id).populate('blogsWritten')
+    
+    res.status(200).json({
+        status : 'success',
+        data : {
+            blogs : blogsWritten
+        }
+    })
+})
+
 exports.getBlogsBySearchParam = asyncCatch(async(req, res, next) => {
     const term = req.body.term;
     const blogs = await Blog.find(
